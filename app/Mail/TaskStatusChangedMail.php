@@ -8,25 +8,44 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Task;
 
+/**
+ * Почтовое уведомление об изменении статуса задачи.
+ *
+ * Отправляется пользователю, когда статус задачи обновлён.
+ *
+ * @property Task $task Задача, статус которой был изменён
+ */
 class TaskStatusChangedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    /**
+     * Задача, по которой отправляется письмо.
+     *
+     * @var Task
+     */
     public Task $task;
 
     /**
-     * Create a new message instance.
+     * Создание нового экземпляра сообщения.
      *
-     * @return void
+     * @param Task $task Задача, статус которой изменён
      */
     public function __construct(Task $task)
     {
         $this->task = $task;
     }
 
+    /**
+     * Сборка почтового сообщения.
+     *
+     * Устанавливает тему письма, шаблон и передаёт в него данные.
+     *
+     * @return $this
+     */
     public function build()
     {
-        return $this->subject('Task status updated')
+        return $this->subject('Task status updated!')
             ->view('emails.task_status_changed')
             ->with(['task' => $this->task]);
     }

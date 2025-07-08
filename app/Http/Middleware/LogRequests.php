@@ -4,16 +4,32 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Middleware LogRequests.
+ *
+ * Логирует каждый входящий HTTP-запрос: метод, путь, параметры, статус ответа и время обработки.
+ * Полезен для мониторинга производительности и отладки API.
+ */
 class LogRequests
 {
     /**
-     * Handle an incoming request.
+     * Обработка входящего запроса.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * Логирует следующую информацию:
+     * - ID пользователя (если авторизован)
+     * - HTTP-метод (`GET`, `POST` и т.д.)
+     * - URI (`/api/tasks`)
+     * - Все параметры запроса
+     * - HTTP-статус ответа
+     * - Время выполнения запроса в миллисекундах
+     *
+     * @param  Request  $request
+     * @param  Closure(Request): (Response|RedirectResponse)  $next
+     * @return Response|RedirectResponse
      */
     public function handle(Request $request, Closure $next)
     {

@@ -8,6 +8,9 @@ class ProjectPolicy
 {
     /**
      * Создание проекта разрешено только для admin или manager.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
      */
     public function create(User $user): bool
     {
