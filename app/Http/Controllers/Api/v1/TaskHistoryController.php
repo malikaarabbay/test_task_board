@@ -22,9 +22,6 @@ class TaskHistoryController extends ApiController
      * @return JsonResponse JSON-ответ с коллекцией истории
      *
      * @route GET /api/tasks/{id}/history
-     * @response 200 {
-     *    "data": { ... }
-     * }
      */
     public function index($id): JsonResponse
     {

@@ -22,14 +22,6 @@ class AuthController extends ApiController
      * @param Request $request HTTP-запрос с полями `email` и `password`
      * @return JsonResponse
      *
-     * @response 200 {
-     *   "data": {
-     *     "token": "..."
-     *   }
-     * }
-     * @response 401 {
-     *   "message": "Unauthorized"
-     * }
      */
     public function login(Request $request)
     {
@@ -57,9 +49,6 @@ class AuthController extends ApiController
      * @param Request $request HTTP-запрос с аутентифицированным пользователем
      * @return JsonResponse
      *
-     * @response 200 {
-     *   "message": "Logged out successfully."
-     * }
      */
     public function logout(Request $request)
     {

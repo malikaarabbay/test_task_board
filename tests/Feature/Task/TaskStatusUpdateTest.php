@@ -20,13 +20,23 @@ class TaskStatusUpdateTest extends TestCase
     public function test_can_update_status_to_completed()
     {
         $user = User::first();
-        $task = Task::first();
+        $task = Task::has('dependencies')->first();
+
+        if (!$task) {
+            $this->markTestSkipped('Нет задачи с зависимостями.');
+        }
+
+        // Завершаем все зависимости задачи
+        foreach ($task->dependencies as $dependency) {
+            $dependency->update(['status' => 'completed']);
+        }
 
         $response = $this->actingAs($user)->patchJson("/api/tasks/{$task->id}/status", [
             'status' => 'completed',
         ]);
 
         $response->assertOk();
+
         $this->assertDatabaseHas('tasks', [
             'id' => $task->id,
             'status' => 'completed',

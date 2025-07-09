@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
 
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::put('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update.status');
+    Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.update.status');
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::get('/tasks/{id}/history', [TaskHistoryController::class, 'index'])->name('tasks.history.index');
     Route::post('/tasks/{id}/comments', [CommentController::class, 'store'])->name('comments.store');

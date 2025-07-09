@@ -9,8 +9,8 @@ use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Services\TaskService;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 /**
  * Контроллер задач.
@@ -30,39 +30,23 @@ class TaskController extends ApiController
      *
      * @route GET /api/tasks
      */
-    public function index(IndexTaskRequest $request)
+    public function index(IndexTaskRequest $request): JsonResponse
     {
-        $filters = $request->validated();
+        try {
+            $filters = $request->validated();
 
-        $tasks = Cache::remember(
-            'tasks_'.md5(json_encode($filters)).'_page_'.$request->get('page',1),
-            60,
-            fn() => Task::with(['executors', 'project', 'dependencies'])
-                ->filterByComplexCriteria($filters)
-                ->paginate(50)
-        );
+            $tasks = Cache::remember(
+                'tasks_'.md5(json_encode($filters)).'_page_'.$request->get('page',1),
+                60,
+                fn() => Task::with(['executors', 'project', 'dependencies'])
+                    ->filterByComplexCriteria($filters)
+                    ->paginate(50)
+            );
 
-        return $this->responseWithData(
-            TaskResource::collection($tasks),
-            200,
-            [
-                'links' => [
-                    'first' => $tasks->url(1),
-                    'last' => $tasks->url($tasks->lastPage()),
-                    'prev' => $tasks->previousPageUrl(),
-                    'next' => $tasks->nextPageUrl(),
-                ],
-                'meta' => [
-                    'current_page' => $tasks->currentPage(),
-                    'from' => $tasks->firstItem(),
-                    'last_page' => $tasks->lastPage(),
-                    'path' => $tasks->path(),
-                    'per_page' => $tasks->perPage(),
-                    'to' => $tasks->lastItem(),
-                    'total' => $tasks->total(),
-                ],
-            ]
-        );
+            return $this->responseWithPagination($tasks, TaskResource::class);
+        } catch (\Throwable $e) {
+            return $this->responseWithError('Something went wrong.', 500);
+        }
     }
 
     /**
@@ -77,15 +61,20 @@ class TaskController extends ApiController
      * @return JsonResponse JSON-ответ с созданной задачей
      *
      * @route POST /api/tasks
-     * @response 201 {
-     *   "data": { ... }
-     * }
      */
-    public function store(StoreTaskRequest $request, TaskService $taskService)
+    public function store(StoreTaskRequest $request, TaskService $taskService): JsonResponse
     {
-        $task = $taskService->create($request->validated());
+        try {
+            $task = $taskService->create($request->validated());
 
-        return $this->responseWithData(new TaskResource($task), 201);
+            return $this->responseWithData(
+                new TaskResource($task),
+                201,
+                'Task created successfully'
+            );
+        } catch (Throwable $e) {
+            return $this->responseWithError('Failed to create task', 500);
+        }
     }
 
     /**
@@ -100,14 +89,19 @@ class TaskController extends ApiController
      * @return JsonResponse JSON-ответ с обновлённой задачей
      *
      * @route PATCH /api/tasks/{task}/status
-     * @response 200 {
-     *   "data": { ... }
-     * }
      */
-    public function updateStatus(UpdateTaskStatusRequest $request, Task $task, TaskService $taskService)
+    public function updateStatus(UpdateTaskStatusRequest $request, Task $task, TaskService $taskService): JsonResponse
     {
-        $task = $taskService->updateStatus($task, $request->validated());
+        try {
+            $task = $taskService->updateStatus($task, $request->validated());
 
-        return $this->responseWithData(new TaskResource($task));
+            return $this->responseWithData(
+                new TaskResource($task),
+                200,
+                'Status updated successfully'
+            );
+        } catch (Throwable $e) {
+            return $this->responseWithError('Failed to update status', 500);
+        }
     }
 }

@@ -40,13 +40,6 @@ class CommentController extends ApiController
      * @param CommentService $commentService Сервис, реализующий логику добавления комментария
      * @return JsonResponse JSON-ответ с добавленным комментарием
      *
-     * @response 201 {
-     *   "data": {
-     *     "id": 1,
-     *     "comment": "Пример текста",
-     *     ...
-     *   }
-     * }
      */
     public function store(StoreCommentRequest $request, $id, CommentService $commentService)
     {

@@ -41,13 +41,6 @@ class ProjectController extends ApiController
      * @return JsonResponse JSON-ответ с данными нового проекта
      *
      * @route POST /api/projects
-     * @response 201 {
-     *   "data": {
-     *     "id": 1,
-     *     "name": "CRM-система",
-     *     ...
-     *   }
-     * }
      */
     public function store(StoreProjectRequest $request)
     {
